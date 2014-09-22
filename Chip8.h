@@ -1,6 +1,8 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdlib.h>
+#include <time.h>
 #include <SDL.h>
 
 
@@ -11,6 +13,7 @@
 #define RAM_OFFSET 0x200
 #define SPRITE_LINE_SIZE 8
 #define PIXEL_SIZE 10
+#define CH8_RAND_MAX 256
 
 class Chip8	{
 public:
@@ -26,7 +29,7 @@ private:
 	uint8_t ram[RAM_SIZE];
 	// registers V0-VF
 	uint8_t V[NUM_REGS];
-	uint8_t stack[STACK_SIZE];
+	uint16_t stack[STACK_SIZE];
 	uint8_t sp;
 	uint16_t pc;
 	uint16_t I;

@@ -27,6 +27,7 @@ Chip8::Chip8() {
 	// initialize rectangle used for displaying sprites
 	r.x = r.y = r.w = r.h = PIXEL_SIZE;
 	placeFontsInMemory();
+	srand(time(NULL));	
 }
 
 void Chip8::run() {
@@ -73,7 +74,7 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 				else if (y == 0xEE) {
 					sp--;
 					pc = stack[sp];
-					printf("return from sub routine");
+					printf("RET FROM SUBROUTINE");
 				}
 				else {
 					printf("RCA 1802");
@@ -143,8 +144,43 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 	} break;
 
 	case 8: {
-				printf("IMPLEMENT ME!");
-				pc += 2;
+				switch (y & 0xF) {
+				case 0: {
+							V[x & 0xF] = V[y >> 4];
+				} break;
+				case 1: {
+							V[x & 0xF] |= V[y >> 4];
+				} break;
+				case 2: {
+							V[x & 0xF] &= V[y >> 4];
+				} break;
+				case 3: {
+							V[x & 0xF] ^= V[y >> 4];
+				} break;
+				case 4: {
+							V[x & 0xF] += V[y >> 4];
+							printf("IMPLEMENT ME!");
+				} break;
+				case 5: {
+							printf("IMPLEMENT ME!");
+				} break;
+				case 6: {
+							V[0xF] = V[x & 0xF] & 0x1;
+							V[x & 0xF] >>= 1;
+				} break;
+				case 7: {
+							printf("IMPLEMENT ME!");
+				} break;
+				case 0xE: {
+							  V[0xF] = (V[x & 0xF] >> 7) & 0x1;
+							  V[x & 0xF] <<= 1;
+				} break;
+				default:
+					printf("UNEXPECTED BOTTOM NYBBLE OF Y. EXITING");
+					exit(-4);
+				}
+				pc += 2;	
+
 	} break;
 
 	case 9: {
@@ -170,7 +206,8 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 	} break;
 
 	case 0xC: {
-				  printf("IMPLEMENT ME");
+				  V[x & 0xF] = (rand() % CH8_RAND_MAX) & y;
+				  printf("V[%x] = 0x%x", x & 0xF, V[x & 0xF]);
 				  pc += 2;
 	} break;
 
@@ -195,8 +232,17 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 	} break;
 
 	case 0xE: {
-				  printf("IMPLEMENT ME");
-				  pc += 2;
+				  if (y == 0x9E) {
+					  printf("IMPLEMENT ME -- KEYBOARD LOCK");
+					  //pc += 2;
+				  }
+				  else if (y == 0xA1) {
+					  pc += 4;
+					  printf("IMPLEMENT ME -- KEYBOARD LOCK");
+				  } else {
+					  printf("UNEXPECTED BOTTOM NYBBLE FOR 0xE, EXITING");
+					  exit(-3);
+				  }
 	} break;
 
 	case 0xF: {
@@ -232,7 +278,9 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 				  } break;
 
 				  case 0x29: {
-								 printf("IMPLEMENT ME");
+								 // each number/letter takes up 5 bytes in ram
+								 I = V[x & 0xF] * 5;
+								 printf("I = BIT DATA FOR V[%x]", x & 0xF);
 								 pc += 2;
 				  } break;
 
@@ -252,7 +300,7 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 								 }
 								 printf("STORE FROM V TO RAM");
 								 pc += 2;
-				  } break;
+					  } break;
 
 				  case 0x65: {
 								 for (int i = 0; i <= (x & 0xF); i++) {
@@ -273,6 +321,8 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 		printf("UNRECOGNIZED OPCODE. THIS SHOULD NOT HAPPEN. EXITING...");
 		exit(-2);
 	}
+
+	if (delayTimer > 0) delayTimer--;
 
 	printf("\n");
 }
