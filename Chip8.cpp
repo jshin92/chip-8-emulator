@@ -24,6 +24,8 @@ Chip8::Chip8() {
 	renderer = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
 	SDL_RenderClear(renderer);
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	// initialize rectangle used for displaying sprites
+	r.x = r.y = r.w = r.h = PIXEL_SIZE;
 
 }
 
@@ -39,8 +41,6 @@ void Chip8::run() {
 
 	bool done = false;
 	SDL_Event e;
-	SDL_Rect r;
-	r.x = 10, r.y = 10, r.w = 10, r.h = 10;
 
 	while (!done) {
 		if (SDL_PollEvent(&e)) {
@@ -51,10 +51,6 @@ void Chip8::run() {
 		if (pc < end)
 			interp(ram[pc], ram[pc + 1]);
 
-		SDL_RenderFillRect(renderer, &r);
-		r.y = 20;
-		r.x = 40;
-		SDL_RenderFillRect(renderer, &r);
 		SDL_RenderPresent(renderer);
 		SDL_UpdateWindowSurface(window);
 	}
@@ -143,7 +139,7 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 
 	case 7: {
 				V[x & 0xF] += y;
-				printf("V[%x] += 0x%x", x >> 4, y);
+				printf("V[%x] += 0x%x", x & 0xF, y);
 				pc += 2;
 	} break;
 
@@ -180,7 +176,22 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 	} break;
 
 	case 0xD: {
-				  printf("IMPLEMENT ME");
+				  // Draws a sprite at location {Vx, Vy}
+				  uint8_t xCoord = V[x & 0xF];
+				  uint8_t yCoord = V[y >> 4];
+				  uint8_t numBytes = y & 0xF;
+				  for (int i = 0; i < numBytes; i++) {
+				      uint8_t spriteLineInfo = ram[I + i];
+					  r.y = yCoord * PIXEL_SIZE + i * PIXEL_SIZE;
+					  for (int j = 0; j < SPRITE_LINE_SIZE; j++) {
+						  if ((spriteLineInfo >> (SPRITE_LINE_SIZE - j - 1)) & 0x1) {
+							  r.x = xCoord * PIXEL_SIZE + j * PIXEL_SIZE;
+							  SDL_RenderFillRect(renderer, &r);
+						  }
+					  }
+				  }
+
+
 				  pc += 2;
 	} break;
 
@@ -247,7 +258,7 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 	} break;
 
 	default:
-		printf("UNRECOGNIZED OPCODE. THIS SHOULD NOT HAPPEN.");
+		printf("UNRECOGNIZED OPCODE. THIS SHOULD NOT HAPPEN. EXITING...");
 		exit(-2);
 	}
 

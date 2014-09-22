@@ -9,6 +9,8 @@
 #define NUM_REGS 16
 #define STACK_SIZE 48
 #define RAM_OFFSET 0x200
+#define SPRITE_LINE_SIZE 8
+#define PIXEL_SIZE 10
 
 class Chip8	{
 public:
@@ -34,5 +36,6 @@ private:
 
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+	SDL_Rect r;
 
 };
