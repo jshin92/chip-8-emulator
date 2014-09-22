@@ -158,18 +158,22 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 							V[x & 0xF] ^= V[y >> 4];
 				} break;
 				case 4: {
+							uint8_t msb = V[x & 0xF] >> 7;
 							V[x & 0xF] += V[y >> 4];
-							printf("IMPLEMENT ME!");
+							V[0xF] = msb == 1 && ((V[x & 0xF] >> 7) == 0) ? 1 : 0;
 				} break;
 				case 5: {
-							printf("IMPLEMENT ME!");
+							V[0xF] = V[x & 0xF] > V[y >> 4];
+							V[x & 0xF] -= V[y >> 4];
+
 				} break;
 				case 6: {
 							V[0xF] = V[x & 0xF] & 0x1;
 							V[x & 0xF] >>= 1;
 				} break;
 				case 7: {
-							printf("IMPLEMENT ME!");
+							V[0xF] = V[y >> 4] > V[x & 0xF];
+							V[x & 0xF] = V[y >> 4] - V[x & 0xF];
 				} break;
 				case 0xE: {
 							  V[0xF] = (V[x & 0xF] >> 7) & 0x1;
