@@ -1,6 +1,9 @@
 #include <stdio.h>
-
+#include "Chip8.h"
 
 int main(int argc, char** argv) {
-	printf("test\n");
+	Chip8 c;
+	c.run();
+
+	return 0;
 }
