@@ -7,6 +7,8 @@
 
 
 #define SCREEN_SIZE 2048
+#define SCREEN_WIDTH 64
+#define SCREEN_HEIGHT 32
 #define RAM_SIZE 4096
 #define NUM_REGS 16
 #define STACK_SIZE 48
@@ -22,6 +24,8 @@ public:
 	bool readRom();
 	void interp(uint8_t x, uint8_t y);
 	void printRom();
+	void clearScreen();
+	void drawActivePixels();
 
 private:
 	void placeFontsInMemory();

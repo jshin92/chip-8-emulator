@@ -44,6 +44,7 @@ void Chip8::run() {
 	SDL_Event e;
 
 	while (!done) {
+		clearScreen();
 		if (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
 				done = true;
@@ -51,7 +52,8 @@ void Chip8::run() {
 		}
 		if (pc < end)
 			interp(ram[pc], ram[pc + 1]);
-
+		
+		drawActivePixels();
 		SDL_RenderPresent(renderer);
 		SDL_UpdateWindowSurface(window);
 	}
@@ -230,11 +232,9 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 				  uint8_t numBytes = y & 0xF;
 				  for (int i = 0; i < numBytes; i++) {
 					  uint8_t spriteLineInfo = ram[I + i];
-					  r.y = yCoord * PIXEL_SIZE + i * PIXEL_SIZE;
 					  for (int j = 0; j < SPRITE_LINE_SIZE; j++) {
 						  if ((spriteLineInfo >> (SPRITE_LINE_SIZE - j - 1)) & 0x1) {
-							  r.x = xCoord * PIXEL_SIZE + j * PIXEL_SIZE;
-							  SDL_RenderFillRect(renderer, &r);
+							  screen[(yCoord + i) * SCREEN_WIDTH + xCoord + j] ^= 1;
 						  }
 					  }
 				  }
@@ -478,4 +478,28 @@ void Chip8::placeFontsInMemory() {
 	ram[79] = 0x80;
 
 }
+
+void Chip8::clearScreen() {
+	// set draw color to black
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	// clear screen
+	SDL_RenderClear(renderer);
+	// set color back to white for drawing
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+}
+
+void Chip8::drawActivePixels() {
+	for (int j = 0; j < SCREEN_HEIGHT; j++) {
+		for (int i = 0; i < SCREEN_WIDTH; i++) {
+			// draw pixel if its active
+			if (screen[j * SCREEN_WIDTH + i]) {
+				r.x = i * PIXEL_SIZE;
+				r.y = j * PIXEL_SIZE;
+				SDL_RenderFillRect(renderer, &r);
+			}
+		}
+	}
+}
+
 
