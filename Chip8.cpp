@@ -66,12 +66,13 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 
 	uint8_t firstNib = x >> 4;
 	switch (firstNib) {
-		// TODO: clearing screen and sub routine return
 	case 0: {
 				if (y == 0xE0) {
 					printf("CLR SCRN");
 				}
 				else if (y == 0xEE) {
+					sp--;
+					pc = stack[sp];
 					printf("return from sub routine");
 				}
 				else {
@@ -86,14 +87,12 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 				pc = newAddr;
 	} break;
 
-		// TODO, finish calling subroutine
 	case 2: {
 				uint16_t target = ((x & 0xF) << 8) | y;
 				stack[sp] = pc;
 				sp++;
 				pc = target;
 				printf("CALL SUBR AT %x", target);
-				// change pc, push addr to stack?
 	} break;
 
 	case 3: {
@@ -248,7 +247,10 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 				  } break;
 
 				  case 0x55: {
-								 printf("IMPLEMENT ME");
+								 for (int i = 0; i < (x & 0xF); i++) {
+									 ram[I + i] = V[i];
+								 }
+								 printf("STORE FROM V TO RAM");
 								 pc += 2;
 				  } break;
 
