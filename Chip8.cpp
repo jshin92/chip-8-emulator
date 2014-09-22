@@ -147,37 +147,45 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 				switch (y & 0xF) {
 				case 0: {
 							V[x & 0xF] = V[y >> 4];
+							printf("V[%x] = 0x%x", x & 0xF, V[y >> 4]);
 				} break;
 				case 1: {
 							V[x & 0xF] |= V[y >> 4];
+							printf("V[%x] |= 0x%x", x & 0xF, V[y >> 4]);
 				} break;
 				case 2: {
 							V[x & 0xF] &= V[y >> 4];
+							printf("V[%x] &= 0x%x", x & 0xF, V[y >> 4]);
 				} break;
 				case 3: {
 							V[x & 0xF] ^= V[y >> 4];
+							printf("V[%x] ^= 0x%x", x & 0xF, V[y >> 4]);
 				} break;
 				case 4: {
 							uint8_t msb = V[x & 0xF] >> 7;
 							V[x & 0xF] += V[y >> 4];
 							V[0xF] = msb == 1 && ((V[x & 0xF] >> 7) == 0) ? 1 : 0;
+							printf("V[%x] += %x ; VF set to %x", x & 0xF, V[y >> 4], V[0xF]);
 				} break;
 				case 5: {
 							V[0xF] = V[x & 0xF] > V[y >> 4];
 							V[x & 0xF] -= V[y >> 4];
-
+							printf("V[%x] -= 0x%x; VF = %x", x & 0xF, V[y >> 4], V[0xF]);
 				} break;
 				case 6: {
 							V[0xF] = V[x & 0xF] & 0x1;
 							V[x & 0xF] >>= 1;
+							printf("V[%x] >>= 1; VF = %x", x & 0xF, V[0xF]);
 				} break;
 				case 7: {
 							V[0xF] = V[y >> 4] > V[x & 0xF];
 							V[x & 0xF] = V[y >> 4] - V[x & 0xF];
+							printf("V[%x] = V[%x] - V[%x] ; VF = %x", x & 0xF, y >> 4, x & 0xF, V[0xF]);
 				} break;
 				case 0xE: {
 							  V[0xF] = (V[x & 0xF] >> 7) & 0x1;
 							  V[x & 0xF] <<= 1;
+							  printf("V[%x] <<= 1 ; VF = %x", x & 0xF, V[0xF]);
 				} break;
 				default:
 					printf("UNEXPECTED BOTTOM NYBBLE OF Y. EXITING");
