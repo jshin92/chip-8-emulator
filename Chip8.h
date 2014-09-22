@@ -21,6 +21,8 @@ public:
 	void printRom();
 
 private:
+	void placeFontsInMemory();
+
 	uint8_t ram[RAM_SIZE];
 	// registers V0-VF
 	uint8_t V[NUM_REGS];
