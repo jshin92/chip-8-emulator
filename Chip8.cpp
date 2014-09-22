@@ -42,7 +42,7 @@ void Chip8::run() {
 	bool done = false;
 	SDL_Event e;
 
-		while (!done) {
+	while (!done) {
 		if (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
 				done = true;
@@ -89,7 +89,10 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 		// TODO, finish calling subroutine
 	case 2: {
 				uint16_t target = ((x & 0xF) << 8) | y;
-				printf("CALL SUBR AT %x\n", target);
+				stack[sp] = pc;
+				sp++;
+				pc = target;
+				printf("CALL SUBR AT %x", target);
 				// change pc, push addr to stack?
 	} break;
 
@@ -178,7 +181,7 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 				  uint8_t yCoord = V[y >> 4];
 				  uint8_t numBytes = y & 0xF;
 				  for (int i = 0; i < numBytes; i++) {
-				      uint8_t spriteLineInfo = ram[I + i];
+					  uint8_t spriteLineInfo = ram[I + i];
 					  r.y = yCoord * PIXEL_SIZE + i * PIXEL_SIZE;
 					  for (int j = 0; j < SPRITE_LINE_SIZE; j++) {
 						  if ((spriteLineInfo >> (SPRITE_LINE_SIZE - j - 1)) & 0x1) {
@@ -209,18 +212,18 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 								printf("IMPLEMENT ME");
 								pc += 2;
 								break;
-				  } 
+				  }
 
-				  case 15: {
-							   delayTimer = V[x & 0xF];
-							   printf("delayTimer = 0x%x", delayTimer);
-							   pc += 2;
+				  case 0x15: {
+								 delayTimer = V[x & 0xF];
+								 printf("delayTimer = 0x%x", delayTimer);
+								 pc += 2;
 				  } break;
 
-				  case 18: {
-							   soundTimer = V[x & 0xF];
-							   printf("soundTimer = 0x%x", soundTimer);
-							   pc += 2;
+				  case 0x18: {
+								 soundTimer = V[x & 0xF];
+								 printf("soundTimer = 0x%x", soundTimer);
+								 pc += 2;
 				  } break;
 
 				  case 0x1E: {
@@ -229,24 +232,32 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 								 pc += 2;
 				  } break;
 
-				  case 29: {
-							   printf("IMPLEMENT ME");
-							   pc += 2;
+				  case 0x29: {
+								 printf("IMPLEMENT ME");
+								 pc += 2;
 				  } break;
 
-				  case 33: {
-							   printf("IMPLEMENT ME");
-							   pc += 2;
+				  case 0x33: {
+								 uint8_t numToStore = V[x & 0xF];
+								 // store the hundreds place at i, tens at i + 1, and ones at i + 2
+								 ram[I + 2] = numToStore % 10;
+								 ram[I + 1] = (numToStore / 10) % 10;
+								 ram[I] = (numToStore / 100) % 10;
+								 printf("STORING BCD NUM : %d", numToStore);
+								 pc += 2;
 				  } break;
 
-				  case 55: {
-							   printf("IMPLEMENT ME");
-							   pc += 2;
+				  case 0x55: {
+								 printf("IMPLEMENT ME");
+								 pc += 2;
 				  } break;
 
-				  case 65: {
-							   printf("IMPLEMENT ME");
-							   pc += 2;
+				  case 0x65: {
+								 for (int i = 0; i <= (x & 0xF); i++) {
+									 V[i] = ram[I + i];
+								 }
+								 printf("LOAD FROM RAM TO V");
+								 pc += 2;
 				  } break;
 
 				  default:
@@ -266,7 +277,7 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 
 bool Chip8::readRom() {
 	FILE* f;
-	f = fopen("Fishie.ch8", "rb");
+	f = fopen("Pong.ch8", "rb");
 	if (!f) return false;
 
 	fseek(f, 0, SEEK_END);
