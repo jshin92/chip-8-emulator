@@ -52,6 +52,9 @@ void Chip8::run() {
 			interp(ram[pc], ram[pc + 1]);
 
 		SDL_RenderFillRect(renderer, &r);
+		r.y = 20;
+		r.x = 40;
+		SDL_RenderFillRect(renderer, &r);
 		SDL_RenderPresent(renderer);
 		SDL_UpdateWindowSurface(window);
 	}
@@ -238,7 +241,7 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 				  } break;
 
 				  default:
-					  printf("This should never be reached! Fatal error.");
+					  printf("Bad opcode for bottom nybble for case 0xF! Fatal error.");
 					  exit(-1);
 				  }
 	} break;
@@ -267,7 +270,7 @@ bool Chip8::readRom() {
 }
 
 void Chip8::printRom() {
-	for (int i = RAM_OFFSET; i < RAM_OFFSET + fileSize; i += 8) {
+	for (unsigned int i = RAM_OFFSET; i < RAM_OFFSET + fileSize; i += 8) {
 		printf("0x%x | ", i);
 		printf("%2x %2x %2x %2x %2x %2x %2x %2x\n\n", ram[i], ram[i + 1],
 			ram[i + 2], ram[i + 3], ram[i + 4], ram[i + 5], ram[i + 6], ram[i + 7]);
