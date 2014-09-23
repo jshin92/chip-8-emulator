@@ -48,7 +48,7 @@ void Chip8::run() {
 		if (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
 				done = true;
-			}
+			}	
 		}
 		if (pc < end)
 			interp(ram[pc], ram[pc + 1]);
@@ -234,6 +234,7 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 					  uint8_t spriteLineInfo = ram[I + i];
 					  for (int j = 0; j < SPRITE_LINE_SIZE; j++) {
 						  if ((spriteLineInfo >> (SPRITE_LINE_SIZE - j - 1)) & 0x1) {
+							  V[0xF] = screen[(yCoord + i) * SCREEN_WIDTH + xCoord + j] == 1;
 							  screen[(yCoord + i) * SCREEN_WIDTH + xCoord + j] ^= 1;
 						  }
 					  }
@@ -245,12 +246,26 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 
 	case 0xE: {
 				  if (y == 0x9E) {
-					  printf("IMPLEMENT ME -- KEYBOARD LOCK");
-					  //pc += 2;
+					  const Uint8 *state = SDL_GetKeyboardState(NULL);
+					  if (state[getMapping(V[x & 0xF])]) {
+						  pc += 4;
+						  printf("SKIP INSTR");
+					  }
+					  else {
+						  pc += 2;
+						  printf("INCR INSTR");
+					  }
 				  }
 				  else if (y == 0xA1) {
-					  pc += 4;
-					  printf("IMPLEMENT ME -- KEYBOARD LOCK");
+					  const Uint8 *state = SDL_GetKeyboardState(NULL);
+					  if (!state[getMapping(V[x & 0xF])]) {
+						  pc += 4;
+						  printf("SKIP INSTR");
+					  }
+					  else {
+						  pc += 2;
+						  printf("INCR PC");
+					  }
 				  } else {
 					  printf("UNEXPECTED BOTTOM NYBBLE FOR 0xE, EXITING");
 					  exit(-3);
@@ -335,6 +350,8 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 	}
 
 	if (delayTimer > 0) delayTimer--;
+	if (soundTimer > 0) soundTimer--;
+	SDL_Delay(2);
 
 	printf("\n");
 }
@@ -503,3 +520,13 @@ void Chip8::drawActivePixels() {
 }
 
 
+SDL_Scancode Chip8::getMapping(uint8_t k) {
+	if (k == 1)        return SDL_SCANCODE_Q;
+	else if (k == 4)   return SDL_SCANCODE_A;
+	else if (k == 0xC) return SDL_SCANCODE_O;
+	else if (k == 0xD) return SDL_SCANCODE_L;
+	else {
+		printf("Unexpected key request! Exiting");
+		exit(-5);
+	}
+}

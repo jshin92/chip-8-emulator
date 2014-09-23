@@ -29,6 +29,8 @@ public:
 
 private:
 	void placeFontsInMemory();
+	SDL_Scancode getMapping(uint8_t k);
+	
 
 	uint8_t ram[RAM_SIZE];
 	// registers V0-VF
@@ -39,6 +41,7 @@ private:
 	uint16_t I;
 	// screen is 64 x 32 = 2048; {w x h}
 	uint8_t screen[SCREEN_SIZE];
+	
 	size_t fileSize;
 	uint8_t delayTimer;
 	uint8_t soundTimer;
@@ -46,5 +49,7 @@ private:
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 	SDL_Rect r;
+
+
 
 };
