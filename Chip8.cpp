@@ -8,7 +8,7 @@ Chip8::Chip8() {
 	printf("Initializing Chip8 emulator...\n\n");
 
 	sp = 0x0;
-	// programs start at 0x200, since 0x0-0x1FF are reserved for the interpreter
+	// programs start at 0x200, since 0x0-0x1FF were traditionally reserved for the interpreter
 	pc = 0x200;
 	I = 0x0;
 	fileSize = 0;
@@ -20,7 +20,8 @@ Chip8::Chip8() {
 	soundTimer = 0;
 
 	SDL_Init(SDL_INIT_VIDEO);
-	window = SDL_CreateWindow("Chip 8 Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 320, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("Chip 8 Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+							  SCREEN_WIDTH * PIXEL_SIZE, SCREEN_HEIGHT * PIXEL_SIZE, SDL_WINDOW_SHOWN);
 	renderer = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
 	SDL_RenderClear(renderer);
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -351,7 +352,7 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 
 	if (delayTimer > 0) delayTimer--;
 	if (soundTimer > 0) soundTimer--;
-	SDL_Delay(2);
+	SDL_Delay(1);
 
 	printf("\n");
 }
