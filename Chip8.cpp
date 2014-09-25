@@ -248,7 +248,7 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 	case 0xE: {
 				  if (y == 0x9E) {
 					  const Uint8 *state = SDL_GetKeyboardState(NULL);
-					  if (state[getMapping(V[x & 0xF])]) {
+					  if (state[getKeyMapping(V[x & 0xF])]) {
 						  pc += 4;
 						  printf("SKIP INSTR");
 					  }
@@ -259,7 +259,7 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 				  }
 				  else if (y == 0xA1) {
 					  const Uint8 *state = SDL_GetKeyboardState(NULL);
-					  if (!state[getMapping(V[x & 0xF])]) {
+					  if (!state[getKeyMapping(V[x & 0xF])]) {
 						  pc += 4;
 						  printf("SKIP INSTR");
 					  }
@@ -282,10 +282,9 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 				  } break;
 
 				  case 0xA: {
-								printf("IMPLEMENT ME");
+								
 								pc += 2;
-								break;
-				  }
+				  } break;
 
 				  case 0x15: {
 								 delayTimer = V[x & 0xF];
@@ -521,13 +520,43 @@ void Chip8::drawActivePixels() {
 }
 
 
-SDL_Scancode Chip8::getMapping(uint8_t k) {
-	if (k == 1)        return SDL_SCANCODE_Q;
-	else if (k == 4)   return SDL_SCANCODE_A;
-	else if (k == 0xC) return SDL_SCANCODE_O;
-	else if (k == 0xD) return SDL_SCANCODE_L;
-	else {
+SDL_Scancode Chip8::getKeyMapping(uint8_t k) {
+	switch (k) {
+	case 1:
+		return SDL_SCANCODE_Q;
+	case 2:
+		return SDL_SCANCODE_W;
+	case 3:
+		return SDL_SCANCODE_E;
+	case 4:
+		return SDL_SCANCODE_A;
+	case 5:
+		return SDL_SCANCODE_S;
+	case 6:
+		return SDL_SCANCODE_D;
+	case 7:
+		return SDL_SCANCODE_Z;
+	case 8:
+		return SDL_SCANCODE_X;
+	case 9:
+		return SDL_SCANCODE_C;
+	case 0xC:
+		return SDL_SCANCODE_R;
+	case 0xD:
+		return SDL_SCANCODE_F;
+	case 0xE:
+		return SDL_SCANCODE_V;
+	case 0xA:
+		return SDL_SCANCODE_Y;
+	case 0x0:
+		return SDL_SCANCODE_U;
+	case 0xB:
+		return SDL_SCANCODE_I;
+	case 0xF:
+		return SDL_SCANCODE_O;
+	default:
 		printf("Unexpected key request! Exiting");
 		exit(-5);
 	}
+
 }

@@ -29,7 +29,7 @@ public:
 
 private:
 	void placeFontsInMemory();
-	SDL_Scancode getMapping(uint8_t k);
+	SDL_Scancode getKeyMapping(uint8_t k);
 	
 
 	uint8_t ram[RAM_SIZE];
