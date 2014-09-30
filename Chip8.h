@@ -30,6 +30,8 @@ public:
 private:
 	void placeFontsInMemory();
 	SDL_Scancode getKeyMapping(uint8_t k);
+	uint8_t getInverseKeyMapping(SDL_Scancode s);
+	bool validKey(SDL_Scancode s);
 	
 
 	uint8_t ram[RAM_SIZE];

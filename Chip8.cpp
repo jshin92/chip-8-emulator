@@ -282,7 +282,18 @@ void Chip8::interp(uint8_t x, uint8_t y) {
 				  } break;
 
 				  case 0xA: {
-								
+								SDL_Event ev;
+								bool foundKey = false;
+								while (!foundKey) {
+									if (SDL_PollEvent(&ev)) {
+										if (ev.type ==	SDL_KEYUP) {
+											if (validKey(ev.key.keysym.scancode)) {
+												V[x & 0xF] = getInverseKeyMapping(ev.key.keysym.scancode);
+												foundKey = true;
+											}
+										}
+									}
+								}
 								pc += 2;
 				  } break;
 
@@ -560,3 +571,59 @@ SDL_Scancode Chip8::getKeyMapping(uint8_t k) {
 	}
 
 }
+
+bool Chip8::validKey(SDL_Scancode s) {
+	return 
+		s == SDL_SCANCODE_Q || s == SDL_SCANCODE_W ||
+		s == SDL_SCANCODE_E || s == SDL_SCANCODE_A ||
+		s == SDL_SCANCODE_S || s == SDL_SCANCODE_D ||
+		s == SDL_SCANCODE_Z || s == SDL_SCANCODE_X ||
+		s == SDL_SCANCODE_C || s == SDL_SCANCODE_R ||
+		s == SDL_SCANCODE_F || s == SDL_SCANCODE_V ||
+		s == SDL_SCANCODE_Y || s == SDL_SCANCODE_U ||
+		s == SDL_SCANCODE_I || s == SDL_SCANCODE_O;
+}
+
+
+uint8_t Chip8::getInverseKeyMapping(SDL_Scancode s) {
+	switch (s) {
+	case SDL_SCANCODE_Q:
+		return 1;
+	case SDL_SCANCODE_W:
+		return 2;
+	case SDL_SCANCODE_E:
+		return 3;
+	case SDL_SCANCODE_A:
+		return 4;
+	case SDL_SCANCODE_S:
+		return 5;
+	case SDL_SCANCODE_D:
+		return 6;
+	case SDL_SCANCODE_Z: 
+		return 7;
+	case SDL_SCANCODE_X:
+		return 8;
+	case SDL_SCANCODE_C:
+		return 9;
+	case SDL_SCANCODE_R:
+		return 0xC;
+	case SDL_SCANCODE_F:
+		return 0xD;
+	case SDL_SCANCODE_V:
+		return 0xE;
+	case SDL_SCANCODE_Y:
+		return 0xA;
+	case SDL_SCANCODE_U:
+		return 0x0;
+	case SDL_SCANCODE_I:
+		return 0xB;
+	case SDL_SCANCODE_O:
+		return 0xF;
+	default:
+		printf("Unexpected scancode! Exiting");
+		exit(-6);
+
+	}
+}
+
+
